@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <!--
+    Miniprojekt 3 (REST Countries) - FE23 Javascript 1
+    Kristoffer Bengtsson
+    -->
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Miniprojekt 3 - Countries</title>
+    <link rel="stylesheet" href="css/countries.css" />
+    <script src="js/countries.js" defer></script>
+  </head>
+  <body>
+    <div id="country-container">
+      <form id="country-form">
+        <div class="form-controls">
+          <label for="country-search">Find</label>
+          <select id="country-search">
+            <option value="name">Country name</option>
+            <option value="lang">Language</option>
+            <option value="capital">Capital</option>
+          </select>
+          <input type="text" name="country-filter" id="country-filter" list="country-name" />
+          <datalist id="country-name"></datalist>
+          <datalist id="country-lang"></datalist>
+          <datalist id="country-capital"></datalist>
+          <button id="country-submit">Find countries!</button>
+        </div>
+        <div class="form-feedback"><span id="country-count"></span></div>
+      </form>
+      <div id="errormessage"></div>
+      <div id="country-output"></div>
+    </div>
+  </body>
+</html>
