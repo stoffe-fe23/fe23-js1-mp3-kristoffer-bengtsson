@@ -7,7 +7,7 @@
 const showFields = ["name", "population", "flags", "languages", "region", "subregion", "capital"];
 
 
-// Hämta giltiga värden och bygg input filter-datalistor
+// Hämta giltiga värden från API och bygg datalistor till inputfältet med förslag till inmatning
 fetchJSON("https://restcountries.com/v3.1/all?fields=cca2,name,languages,capital", buildCountryLists, errorHandlerBuild);
 
 
@@ -57,7 +57,7 @@ document.querySelector("#country-search").addEventListener("change", (event) => 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Bygg datalistor med giltiga värden för inmatningsfältet
+// Bygg datalistor med förslags-värden för inmatningsfältet
 function buildCountryLists(countries) {
     const countryData = document.querySelector("#country-name");
     const languageData = document.querySelector("#country-lang");
@@ -76,7 +76,7 @@ function buildCountryLists(countries) {
         countryOption.innerText = country.name.common;
         countryData.appendChild(countryOption);
 
-        // Samla ihop alla språk (utan dubletter)
+        // Samla ihop alla språk (utan dubletter) i separat lista
         if (country.languages !== undefined) {
             for (const lang in country.languages) {
                 if (!languageList.includes(country.languages[lang]) && (country.languages[lang].length > 0)) {
@@ -85,7 +85,7 @@ function buildCountryLists(countries) {
             }
         }
 
-        // Samla ihop alla huvudstäder
+        // Samla ihop alla huvudstäder i separat lista
         if (country.capital !== undefined) {
             if (!capitalList.includes(country.capital) && (country.capital.length > 0)) {
                 capitalList.push(country.capital);
@@ -93,7 +93,7 @@ function buildCountryLists(countries) {
         }
     }
 
-    // Sortera val i bokstavsordning innan datalistorna byggs
+    // Sortera listorna i bokstavsordning innan HTML-datalistorna byggs
     languageList.sort();
     capitalList.sort();
 
@@ -172,7 +172,7 @@ function showCountries(countries) {
         if (country.capital !== undefined) {
             const capitalField = document.createElement("div");
             capitalField.classList.add("capital");
-            capitalField.innerHTML = `<strong>Capital:</strong> ${country.capital}`;
+            capitalField.innerHTML = `<strong>Capital:</strong> ${ country.capital.length > 0 ? country.capital : "None"}`;
             countryBox.appendChild(capitalField);
         }
 
@@ -183,7 +183,7 @@ function showCountries(countries) {
 
             popField.classList.add("population");
 
-            // Visa folkmängd avrundat i miljoner istället om landet har mer än 1 miljon invånare
+            // Visa folkmängd avrundat i miljoner istället om landet har över 1 miljon invånare
             if (popRounded >= 1000000) {
                 popRounded = (popRounded / 1000000).toFixed(1) + " million";
             }
@@ -218,7 +218,7 @@ function showCountries(countries) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Återställ sökformuläret
+// Återställ sökformuläret - rensa tidigare resultat och felmeddelanden
 function resetSearchForm() {
     const resultCount = document.querySelector("#country-count");
 
@@ -229,12 +229,13 @@ function resetSearchForm() {
 }
 
 
+////////////////////////////////////////////////////////////////////////////////////////
+// Visa för användaren hur många länder som hittades i en sökning
 function setSearchResultCount(count) {
     const resultCount = document.querySelector("#country-count");
     resultCount.classList.add("show");
     resultCount.innerText = (count > 0 ? count : "No") + (count == 1 ? " country found!" : " countries found!")
 }
-
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
