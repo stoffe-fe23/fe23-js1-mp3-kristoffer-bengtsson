@@ -257,17 +257,18 @@ function resetResultMessages() {
 ////////////////////////////////////////////////////////////////////////////////////////
 // Lås sök-formuläret medan data laddas och visas
 function lockSearchForm(isLocked) {
+    document.querySelector("#country-submit").disabled = isLocked;
+    document.querySelector("#country-search").disabled = isLocked;
+    document.querySelector("#country-filter").disabled = isLocked;
+
     // Visa snurrande Laddar-indikator, om förfrågan skulle råka ta längre tid
     if (isLocked) {
         document.querySelector("#load-indicator").classList.add("show");
     }
     else {
         document.querySelector("#load-indicator").classList.remove("show");
+        document.querySelector("#country-filter").focus();
     }
-
-    document.querySelector("#country-submit").disabled = isLocked;
-    document.querySelector("#country-search").disabled = isLocked;
-    document.querySelector("#country-filter").disabled = isLocked;
 }
 
 
