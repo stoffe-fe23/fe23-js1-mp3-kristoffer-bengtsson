@@ -2,7 +2,7 @@
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,400,700,800,400italic,700italic");
 
 /*
-    Miniprojekt 3 (REST Countries) - FE23 Javascript 1
+    Miniprojekt 3 (REST Countries API) - FE23 Javascript 1
     Kristoffer Bengtsson
 */
 
@@ -54,7 +54,6 @@ form {
   flex-wrap: nowrap;
   padding: 1rem;
   margin: 0.5rem;
-  border: 1px solid black;
   background-color: black;
   color: white;
 }
@@ -128,6 +127,11 @@ form button:hover {
   padding: 0 0 1rem 0;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.15);
   font-family: "Open Sans", Arial, sans-serif;
+  text-align: center;
+}
+
+.countrybox img {
+  max-width: 100%;
 }
 
 .countrybox ul {
@@ -145,11 +149,11 @@ form button:hover {
 .countrybox > div {
   margin-bottom: 0.75rem;
   text-align: center;
-  padding: 0 0.5rem;
+  padding: 0.25rem 1rem;
 }
 
 .countrybox > div strong,
-.subheading {
+.languages {
   display: block;
   color: rgb(100, 175, 204);
   font-family: "Roboto Condensed", Arial, sans-serif;
@@ -158,30 +162,25 @@ form button:hover {
   text-transform: uppercase;
 }
 
-.flagbox {
-  font-size: 9rem;
+.countrybox div.languages {
+  padding: 0;
+  margin: 0;
 }
 
-.nativenames {
-  margin-bottom: 1rem;
-  font-style: italic;
-  text-align: center;
-}
-
-.subregion {
-  margin-top: 2rem;
-  padding: 0.5rem 2rem;
-}
-
-.capital,
-.population,
-.languages {
-  padding: 0.25rem 2rem;
-}
-
-.population ul {
+.countrybox ul {
   list-style: none;
   padding: 0;
+  margin-bottom: 1rem;
+}
+
+.countrybox ul:first-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.countrybox ul:first-of-type li {
+  font-style: italic;
+  text-align: center;
+  padding: 0 1rem;
 }
 
 /*****************************************************************************************/

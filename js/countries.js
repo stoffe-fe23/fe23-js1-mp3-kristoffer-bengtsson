@@ -1,11 +1,7 @@
 /*
-    Miniprojekt 3 (REST Countries) - FE23 Javascript 1
+    Miniprojekt 3 (REST Countries API) - FE23 Javascript 1
     Kristoffer Bengtsson
 */
-
-// Informationsfält att visa om länder
-const showFields = ["name", "population", "flags", "languages", "region", "subregion", "capital"];
-
 
 // Hämta giltiga värden från API och bygg datalistor till inputfältet när sidan laddas
 fetchJSON("https://restcountries.com/v3.1/all?fields=name,languages,capital", buildCountryLists, errorHandlerBuild);
@@ -19,28 +15,36 @@ fetchJSON("https://restcountries.com/v3.1/all?fields=name,languages,capital", bu
 ////////////////////////////////////////////////////////////////////////////////////////
 // SUBMIT: Sökformuläret för länder
 document.querySelector("#country-form").addEventListener("submit", (event) => {
-    const filterType = document.querySelector("#country-search").value;
+    event.preventDefault();
+    
+    const typeElem = document.querySelector("#country-search");
     const filterElem = document.querySelector("#country-filter");
+    const filterType = typeElem.value;
     const filterInput = filterElem.value.trim();
 
-    event.preventDefault();
+    // Informationsfält om länder att visa
+    const showFields = ["name", "population", "flags", "languages", "region", "subregion", "capital"];
+
     resetResultMessages();
     filterElem.select();
 
     if (filterInput.length > 0) {
+        // Lås sökformuläret medan behandling av sökning pågår
         lockSearchForm(true);
+
         const requestURL = new URL(`https://restcountries.com/v3.1/${filterType}/${filterInput}`);
         requestURL.searchParams.append("fields", showFields.join(","));
         fetchJSON(requestURL, showCountries);
     }
     else {
-        showUserError(`Please enter a ${getSearchType(filterType)} in the box above.`);
+        const filterTypeSelected = document.querySelector("#country-search option:checked");
+        showUserError(`Please enter a ${filterTypeSelected.innerText.toLowerCase()} in the search box above.`);
     }
 });
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// CHANGE: Meny för ändring av söktyp, byter datalista på inmatningsfältet
+// CHANGE: Meny för ändring av söktyp, byt datalista på inmatningsfältet
 document.querySelector("#country-search").addEventListener("change", (event) => {
     const filterInput = document.querySelector("#country-filter");
     filterInput.setAttribute("list", `country-${event.currentTarget.value}`);
@@ -60,7 +64,7 @@ async function fetchJSON(fetchURL, callbackFunc, errorFunc = errorHandler) {
     try {
         const response = await fetch(fetchURL);
         if (!response.ok)
-            throw new ErrorWithCode(`Invalid response: ${response.statusText}`, response.status);
+            throw new ErrorWithCode(response.statusText, response.status);
 
         const result = await response.json();
         callbackFunc(result);
@@ -109,7 +113,7 @@ function buildCountryLists(countries) {
         }
     }
 
-    // Sortera datan i bokstavsordning innan HTML-datalistorna byggs
+    // Sortera datan i bokstavsordning
     languageList.sort();
     capitalList.sort();
 
@@ -132,7 +136,7 @@ function buildCountryLists(countries) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Presentera länder på sidan
+// Presentera sökresultatet på sidan
 function showCountries(countries) {
     const resultCount = document.querySelector("#country-count");
     const outBox = document.querySelector("#country-output");
@@ -154,7 +158,7 @@ function showCountries(countries) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Returnera DOM-element för presentation av ett land
+// Returnera ett kort med info om ett land
 function getCountryElement(country) {
     const countryBox = document.createElement("div");
     countryBox.classList.add("countrybox");
@@ -162,7 +166,6 @@ function getCountryElement(country) {
     // Flaggan
     if (country.flags !== undefined) {
         const flagImg = document.createElement("img");
-        flagImg.classList.add("flagbox");
         flagImg.src = country.flags.png;
         flagImg.alt = country.flags.alt;
         countryBox.appendChild(flagImg);
@@ -171,15 +174,17 @@ function getCountryElement(country) {
     // Namn
     if (country.name !== undefined) {
         const nameField = document.createElement("h3");
-        const nameNative = document.createElement("div");
-        nameNative.classList.add("nativenames");
+        const nameNative = document.createElement("ul");
+        const displayedNames = [];
         nameField.innerText = country.name.common;
-
-        // Officiella namn
         for (const inLanguage in country.name.nativeName) {
-            const nameRow = document.createElement("div");
-            nameRow.innerText = country.name.nativeName[inLanguage].official;
-            nameNative.appendChild(nameRow);
+            // Filtrera dubletter då vissa länder har exakt samma namn listat flera gånger (looking at you Zimbabwe...)
+            if (!displayedNames.includes(country.name.nativeName[inLanguage].official)) {
+                const nameRow = document.createElement("li");
+                nameRow.innerText = country.name.nativeName[inLanguage].official;
+                displayedNames.push(country.name.nativeName[inLanguage].official);
+                nameNative.appendChild(nameRow);
+            }
         }
         countryBox.append(nameField, nameNative);
     }
@@ -187,7 +192,6 @@ function getCountryElement(country) {
     // Region
     if (country.subregion !== undefined) {
         const regionField = document.createElement("div");
-        regionField.classList.add("subregion");
         regionField.innerHTML = `<strong>Region:</strong> ${country.subregion}`;
         countryBox.appendChild(regionField);
         if (country.region !== undefined) {
@@ -198,7 +202,6 @@ function getCountryElement(country) {
     // Huvudstad
     if (country.capital !== undefined) {
         const capitalField = document.createElement("div");
-        capitalField.classList.add("capital");
         capitalField.innerHTML = `<strong>Capital:</strong> ${ country.capital.length > 0 ? country.capital : "None"}`;
         countryBox.appendChild(capitalField);
     }
@@ -206,24 +209,17 @@ function getCountryElement(country) {
     // Folkmängd
     if (country.population !== undefined) {
         const popField = document.createElement("div");
-        popField.classList.add("population");
-
-        // Visa folkmängd avrundat i miljoner istället om landet har över 1 miljon invånare
+        // Visa folkmängd avrundat i miljoner om landet har över 1 miljon invånare
         const popRounded = (country.population >= 1000000) ? (country.population / 1000000).toFixed(1) + " million" : country.population;
         popField.innerHTML = `<strong>Population:</strong> ${popRounded}`;
-        
         countryBox.appendChild(popField);
     }
 
     // Språk
     if (country.languages !== undefined) {
-        const langBox = document.createElement("div");
         const langList = document.createElement("ul");
         const langsTitle = document.createElement("div");
-
-        langsTitle.classList.add("subheading");
-        langBox.classList.add("population");
-        
+        langsTitle.classList.add("languages");        
         langsTitle.innerText = "Language(s):";
 
         for (const lang in country.languages) {
@@ -231,9 +227,7 @@ function getCountryElement(country) {
             langItem.innerText = country.languages[lang];
             langList.appendChild(langItem);
         }
-
-        langBox.append(langsTitle, langList);
-        countryBox.appendChild(langBox);
+        countryBox.append(langsTitle, langList);
     }
 
     return countryBox;
@@ -241,7 +235,7 @@ function getCountryElement(country) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Återställ fält - rensa tidigare resultat och felmeddelanden
+// Återställ fält - rensa ev. befintliga resultat och felmeddelanden
 function resetResultMessages() {
     const errorBox = document.querySelector("#errormessage");
     const resultCount = document.querySelector("#country-count");
@@ -261,7 +255,7 @@ function lockSearchForm(isLocked) {
     document.querySelector("#country-search").disabled = isLocked;
     document.querySelector("#country-filter").disabled = isLocked;
 
-    // Visa snurrande Laddar-indikator, om förfrågan skulle råka ta längre tid
+    // Visa snurrande Laddar-indikator (om förfrågan skulle råka ta lång tid)
     if (isLocked) {
         document.querySelector("#load-indicator").classList.add("show");
     }
@@ -287,31 +281,28 @@ function errorHandler(error) {
         else if (error.errorCode == 429) {
             showUserError("Too many searches in a short time, wait a while and try again...");
         }
-        else if ((error.errorCode >= 500) && (error.errorCode < 512)) {
-            showUserError("There is a problem with the country database server at the moment. Try again later?");
-        }
         else {
             showUserError(`An error occurred fetching data, please try again later. (${error.errorCode})`);
         }
-        console.error("ERROR", error.errorCode, error.message);
+        console.log("ERROR", error.errorCode, error.message);
     }
     else {
-        showUserError(`An error occurred when loading data, please try again later.`);
+        showUserError(`An error occurred when loading country data, please try again later.`);
         console.error("API error", error);
     }    
-    // Lås upp formuläret igen om ett fel inträffade
+    // Lås upp sökformuläret igen om ett fel inträffade
     lockSearchForm(false);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Felhanterare för laddning av data för inmatningsfältets datalistor när sidan laddas
+// Felhanterare för laddning av data för inmatningsfältets datalistor (när sidan laddas)
 function errorHandlerBuild(error) {
     if (error instanceof ErrorWithCode) {
         if (error.errorCode == 404) {
             showUserError("Warning: Unable to load country data. Suggestions may be unavailable.");
         }
-        console.error("Datalist Build", error.errorCode, error.message);
+        console.log("Datalist Build", error.errorCode, error.message);
     }
     else {
         console.error("API error", error);
@@ -322,8 +313,8 @@ function errorHandlerBuild(error) {
 ////////////////////////////////////////////////////////////////////////////////////////
 // Visa felmeddelande för användaren i ruta under sökformuläret
 function showUserError(message) {
-    const errorBox = document.querySelector("#errormessage");
     if (message.length > 0) {   
+        const errorBox = document.querySelector("#errormessage");
         const errorMessage = document.createElement("div");
         errorMessage.innerText = message;
         errorBox.appendChild(errorMessage);
@@ -333,20 +324,8 @@ function showUserError(message) {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Returnera en textetikett för en söktyp, att visa för användaren
-function getSearchType(type) {
-    switch (type) {
-        case "name":    return "country name";
-        case "lang":    return "language";
-        case "capital": return "capital city";
-        default:        return "search criteria";
-    }
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////
-// Subklass för att lägga till ny errorCode-property till Error,
-// Används för att separera status-kod från felmeddelande i exception.
+// Subklass för att lägga till en extra errorCode-property till Error,
+// Används för att separera status-kod från felmeddelande i egna exceptions.
 class ErrorWithCode extends Error {
     errorCode = 0;
     constructor(message, code) {
