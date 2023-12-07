@@ -145,6 +145,7 @@ form button:hover {
 .countrybox > div {
   margin-bottom: 0.75rem;
   text-align: center;
+  padding: 0 0.5rem;
 }
 
 .countrybox > div strong,
