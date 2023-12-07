@@ -7,12 +7,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Miniprojekt 3 - Countries</title>
+    <title>Miniprojekt 3 - REST Countries API</title>
     <link rel="stylesheet" href="css/countries.css" />
     <script src="js/countries.js" defer></script>
   </head>
   <body>
-    <div id="country-container">
+    <main id="country-container">
+      <!-- Sökformuläret-->
       <form id="country-form">
         <div class="form-controls">
           <label for="country-search">Find</label>
@@ -21,16 +22,20 @@
             <option value="lang">Language</option>
             <option value="capital">Capital city</option>
           </select>
-          <input type="text" name="country-filter" id="country-filter" list="country-name" />
+          <input type="text" name="country-filter" id="country-filter" list="country-name" autocomplete="off" />
           <datalist id="country-name"></datalist>
           <datalist id="country-lang"></datalist>
           <datalist id="country-capital"></datalist>
           <button id="country-submit">Find countries!</button>
+          <!-- Snurrande ikon som visar att resultat håller på att laddas -->
+          <div id="load-indicator"></div>
         </div>
         <div class="form-feedback"><span id="country-count"></span></div>
       </form>
+      <!-- Container för felmeddelanden -->
       <div id="errormessage"></div>
+      <!-- Container för sökresultat -->
       <div id="country-output"></div>
-    </div>
+    </main>
   </body>
 </html>
