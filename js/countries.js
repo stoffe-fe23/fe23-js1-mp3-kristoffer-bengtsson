@@ -17,9 +17,8 @@ fetchJSON("https://restcountries.com/v3.1/all?fields=name,languages,capital", bu
 document.querySelector("#country-form").addEventListener("submit", (event) => {
     event.preventDefault();
     
-    const typeElem = document.querySelector("#country-search");
     const filterElem = document.querySelector("#country-filter");
-    const filterType = typeElem.value;
+    const filterType = document.querySelector("#country-search").value;
     const filterInput = filterElem.value.trim();
 
     // Informationsfält att visa om länder
@@ -252,9 +251,11 @@ function resetResultMessages() {
 ////////////////////////////////////////////////////////////////////////////////////////
 // Lås sök-formuläret medan data laddas och visas
 function lockSearchForm(isLocked) {
+    const filterElem = document.querySelector("#country-filter");
+    
     document.querySelector("#country-submit").disabled = isLocked;
     document.querySelector("#country-search").disabled = isLocked;
-    document.querySelector("#country-filter").disabled = isLocked;
+    filterElem.disabled = isLocked;
 
     // Visa snurrande Laddar-indikator (om förfrågan skulle råka ta lång tid)
     if (isLocked) {
@@ -262,7 +263,8 @@ function lockSearchForm(isLocked) {
     }
     else {
         document.querySelector("#load-indicator").classList.remove("show");
-        document.querySelector("#country-filter").focus();
+        filterElem.focus();
+        filterElem.select();
     }
 }
 
