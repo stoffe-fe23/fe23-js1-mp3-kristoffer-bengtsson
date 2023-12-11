@@ -3,7 +3,7 @@
     Kristoffer Bengtsson
 */
 
-// Hämta giltiga värden från API och bygg datalistor till inputfältet när sidan laddas
+// Hämta giltiga värden från API och bygg datalistor till inputfältet (förslag)
 fetchJSON("https://restcountries.com/v3.1/all?fields=name,languages,capital", buildCountryLists, errorHandlerBuild);
 
 
@@ -22,14 +22,14 @@ document.querySelector("#country-form").addEventListener("submit", (event) => {
     const filterType = typeElem.value;
     const filterInput = filterElem.value.trim();
 
-    // Informationsfält om länder att visa
+    // Informationsfält att visa om länder
     const showFields = ["name", "population", "flags", "languages", "region", "subregion", "capital"];
 
     resetResultMessages();
     filterElem.select();
 
     if (filterInput.length > 0) {
-        // Lås sökformuläret medan behandling av sökning pågår
+        // Lås sökformuläret och visa indikator medan behandling av sökning pågår
         lockSearchForm(true);
 
         const requestURL = new URL(`https://restcountries.com/v3.1/${filterType}/${filterInput}`);
@@ -44,7 +44,7 @@ document.querySelector("#country-form").addEventListener("submit", (event) => {
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// CHANGE: Meny för ändring av söktyp, byt datalista på inmatningsfältet
+// CHANGE: Meny för ändring av söktyp, byter datalista på inmatningsfältet
 document.querySelector("#country-search").addEventListener("change", (event) => {
     const filterInput = document.querySelector("#country-filter");
     filterInput.setAttribute("list", `country-${event.currentTarget.value}`);
@@ -87,7 +87,7 @@ function buildCountryLists(countries) {
     const capitalList = [];
 
     // Sortera länderna efter kort namn i bokstavsordning
-    countries.sort((a, b) =>  a.name.common.localeCompare(b.name.common));
+    countries.sort((countryA, countryB) =>  countryA.name.common.localeCompare(countryB.name.common));
 
     for (const country of countries) {
         // Bygg landsnamn-datalistan
@@ -146,11 +146,11 @@ function showCountries(countries) {
     resultCount.innerText = (countries.length > 0 ? countries.length : "No") + (countries.length == 1 ? " country found!" : " countries found!")
 
     // Sortera länderna efter folkmängd i fallande ordning.
-    countries.sort( (a, b) => b.population - a.population );
+    countries.sort( (countryA, countryB) => countryB.population - countryA.population );
 
     // Visa länderna
     for (const country of countries) {
-        outBox.appendChild(getCountryElement(country));
+        outBox.appendChild(getCountryCard(country));
     }
 
     lockSearchForm(false);
@@ -159,7 +159,7 @@ function showCountries(countries) {
 
 ////////////////////////////////////////////////////////////////////////////////////////
 // Returnera ett kort med info om ett land
-function getCountryElement(country) {
+function getCountryCard(country) {
     const countryBox = document.createElement("div");
     countryBox.classList.add("countrybox");
 
@@ -219,14 +219,15 @@ function getCountryElement(country) {
     if (country.languages !== undefined) {
         const langList = document.createElement("ul");
         const langsTitle = document.createElement("div");
-        langsTitle.classList.add("languages");        
-        langsTitle.innerText = "Language(s):";
-
+        let langCount = 0;
         for (const lang in country.languages) {
+            langCount++;
             const langItem = document.createElement("li");
             langItem.innerText = country.languages[lang];
             langList.appendChild(langItem);
         }
+        langsTitle.classList.add("languages");        
+        langsTitle.innerText = `Language${langCount == 1 ? "" : "s"}:`;
         countryBox.append(langsTitle, langList);
     }
 
