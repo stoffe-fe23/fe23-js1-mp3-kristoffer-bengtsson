@@ -25,7 +25,6 @@ document.querySelector("#country-form").addEventListener("submit", (event) => {
     const showFields = ["name", "population", "flags", "languages", "region", "subregion", "capital"];
 
     resetResultMessages();
-    filterElem.select();
 
     if (filterInput.length > 0) {
         // Lås sökformuläret och visa indikator medan behandling av sökning pågår
@@ -38,6 +37,7 @@ document.querySelector("#country-form").addEventListener("submit", (event) => {
     else {
         const filterTypeSelected = document.querySelector("#country-search option:checked");
         showUserError(`Please enter a ${filterTypeSelected.innerText.toLowerCase()} in the search box above.`);
+        filterElem.select();
     }
 });
 
@@ -252,7 +252,7 @@ function resetResultMessages() {
 // Lås sök-formuläret medan data laddas och visas
 function lockSearchForm(isLocked) {
     const filterElem = document.querySelector("#country-filter");
-    
+
     document.querySelector("#country-submit").disabled = isLocked;
     document.querySelector("#country-search").disabled = isLocked;
     filterElem.disabled = isLocked;
