@@ -3,7 +3,7 @@
     Kristoffer Bengtsson
 */
 
-// Hämta giltiga värden från API och bygg datalistor till inputfältet (förslag)
+// Hämta giltiga värden från API och bygg datalistor till inputfältets förslag
 fetchJSON("https://restcountries.com/v3.1/all?fields=name,languages,capital", buildCountryLists, errorHandlerBuild);
 
 
@@ -35,15 +35,15 @@ document.querySelector("#country-form").addEventListener("submit", (event) => {
         fetchJSON(requestURL, showCountries);
     }
     else {
-        const filterTypeSelected = document.querySelector("#country-search option:checked");
-        showUserError(`Please enter a ${filterTypeSelected.innerText.toLowerCase()} in the search box above.`);
+        const filterTypeSelected = document.querySelector("#country-search option:checked").innerText.toLowerCase();
+        showUserError(`Please enter a ${filterTypeSelected} in the search box above.`);
         filterElem.select();
     }
 });
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// CHANGE: Meny för ändring av söktyp, byter datalista på inmatningsfältet
+// CHANGE: Meny för ändring av söktyp, byter aktiv datalista på inmatningsfältet
 document.querySelector("#country-search").addEventListener("change", (event) => {
     const filterInput = document.querySelector("#country-filter");
     filterInput.setAttribute("list", `country-${event.currentTarget.value}`);
@@ -85,8 +85,8 @@ function buildCountryLists(countries) {
     const languageList = [];
     const capitalList = [];
 
-    // Sortera länderna efter kort namn i bokstavsordning
-    countries.sort((countryA, countryB) =>  countryA.name.common.localeCompare(countryB.name.common));
+    // Sortera länderna efter kort namn i stigande bokstavsordning
+    countries.sort((countryA, countryB) => countryA.name.common.localeCompare(countryB.name.common));
 
     for (const country of countries) {
         // Bygg landsnamn-datalistan
@@ -112,7 +112,7 @@ function buildCountryLists(countries) {
         }
     }
 
-    // Sortera datan i bokstavsordning
+    // Sortera datan i stigande bokstavsordning
     languageList.sort();
     capitalList.sort();
 
@@ -144,7 +144,7 @@ function showCountries(countries) {
     resultCount.classList.add("show");
     resultCount.innerText = (countries.length > 0 ? countries.length : "No") + (countries.length == 1 ? " country found!" : " countries found!")
 
-    // Sortera länderna efter folkmängd i fallande ordning.
+    // Sortera länderna efter folkmängd i fallande nummerordning.
     countries.sort( (countryA, countryB) => countryB.population - countryA.population );
 
     // Visa länderna
